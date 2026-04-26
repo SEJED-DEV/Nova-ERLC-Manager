@@ -1,7 +1,18 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-
+ 
+## [1.0.2] - 2026-04-26
+ 
+### Added
+- **Multiple Notification Roles**: `NOTIFICATIONS_ROLE_ID` now supports a comma-separated list of IDs.
+- **Special Pings**: Added support for `everyone` and `here` keywords in the notification role list.
+- **Expanded Intents**: Included `DirectMessages` and `GuildPresences` in the bot configuration to ensure full functionality and smoother handshakes.
+- **Environment Template**: Created `.env.example` to simplify initial setup for new users.
+ 
+### Changed
+- **Role Toggle Logic**: The notification role button now intelligently toggles the first valid role ID found in the configuration list, skipping special identifiers.
+ 
 ## [1.0.1] - 2026-04-26
 
 ### Fixed

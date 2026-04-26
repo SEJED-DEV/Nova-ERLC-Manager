@@ -142,6 +142,7 @@ Configuration is handled via environment variables. Rename `.env.example` to `.e
 | `TOKEN` | Your Discord Bot Token. | **Crucial** |
 | `GUILD_ID` | The ID of your Discord Server. | **Crucial** |
 | `STAFF_ROLE_ID`| The ID of the role allowed to use staff commands. | Required |
+| `NOTIFICATIONS_ROLE_ID`| Comma-separated list of IDs to ping. Supports `everyone` and `here`. | Optional |
 | `ERLC_SERVER_KEY`| The API Key from your PRC Private Server Panel. | Highly Recommended |
 | `LOGS_CHANNEL_ID`| Channel where infractions and **errors** are sent. | Recommended |
 
