@@ -9,12 +9,19 @@ module.exports = {
     async execute(interaction, client) {
         const { session, theme, roles, channels } = config;
 
+        const pings = roles.notifications.map(id => {
+            if (id.toLowerCase() === "everyone") return "@everyone";
+            if (id.toLowerCase() === "here") return "@here";
+            return `<@&${id}>`;
+        }).join(" ");
+
         const embed = new EmbedBuilder()
             .setColor(theme.color)
             .setTitle("**Session Boost**")
             .setDescription(config.messages.boost)
-            .setImage(session.images.header || null)
             .setFooter({ text: `${client.user.username} | Boost` });
+        
+        if (session.images.header) embed.setImage(session.images.header);
 
         let channel;
         if (channels.session) {
@@ -25,12 +32,6 @@ module.exports = {
         }
 
         if (channel) {
-            const pings = roles.notifications.map(id => {
-                if (id.toLowerCase() === "everyone") return "@everyone";
-                if (id.toLowerCase() === "here") return "@here";
-                return `<@&${id}>`;
-            }).join(" ");
-
             await channel.send({
                 content: pings || null,
                 embeds: [embed],

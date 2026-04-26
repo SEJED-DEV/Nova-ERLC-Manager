@@ -132,8 +132,9 @@ module.exports = {
                     "**Game Information**\n" +
                     "> **Server Name**: " + (session.serverName || "N/A") + "\n" +
                     "> **Join Code**: " + (session.joinCode || "N/A") + "\n\n"
-                )
-                .setImage(session.images.header || null);
+                );
+            
+            if (session.images.header) embedMain.setImage(session.images.header);
 
             const quickJoinLink = session.quickJoinUrl || "https://policeroleplay.community/";
             const startLinkButton = new ActionRowBuilder().addComponents(

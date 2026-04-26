@@ -20,6 +20,6 @@ All notable changes to this project will be documented in this file.
 - **Giveaway Utils Path**: Fixed `giveaway-reroll.js` to correctly point to `src/utils/giveawayUtil.js`.
 - **Graceful Intent Handling**: Added custom error handling for "Disallowed Intents" to provide clear setup instructions instead of a crash stack trace.
 
-## [1.0.0] - 2026-04-26
+## [1.0.0]
 - Initial release of Nova ERLC Manager.
 - Features: Session Management, Staff Moderation, Giveaways, and Live Dashboards.

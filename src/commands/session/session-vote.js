@@ -35,9 +35,14 @@ module.exports = {
             }
         }, 3600000);
 
-        const embedHeader = new EmbedBuilder()
-            .setColor(theme.color)
-            .setImage(session.images.header || null);
+        const pings = roles.notifications.map(id => {
+            if (id.toLowerCase() === "everyone") return "@everyone";
+            if (id.toLowerCase() === "here") return "@here";
+            return `<@&${id}>`;
+        }).join(" ");
+
+        const embedHeader = new EmbedBuilder().setColor(theme.color);
+        if (session.images.header) embedHeader.setImage(session.images.header);
 
         const embedMain = new EmbedBuilder()
             .setColor(theme.color)
@@ -46,8 +51,9 @@ module.exports = {
                 `> Please cast your vote below for the upcoming session. We require **${requiredVotes} votes** to start a session. \n\n` +
                 `> If you vote, you are committing to join. Failure to participate after voting will result in moderation.`
             )
-            .setImage(session.images.footer || null)
             .setFooter({ text: client.user.username });
+        
+        if (session.images.footer) embedMain.setImage(session.images.footer);
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -69,12 +75,6 @@ module.exports = {
         if (!channel) {
             channel = interaction.channel; // Fallback to current channel if not configured
         }
-
-        const pings = roles.notifications.map(id => {
-            if (id.toLowerCase() === "everyone") return "@everyone";
-            if (id.toLowerCase() === "here") return "@here";
-            return `<@&${id}>`;
-        }).join(" ");
 
         await channel.send({
             content: pings || null,

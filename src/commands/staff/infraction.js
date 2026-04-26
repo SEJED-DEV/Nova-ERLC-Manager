@@ -42,11 +42,30 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
 
-        // Log to logs channel (only attempt if configured in .env)
+        // DM the user
+        try {
+            const dmEmbed = new EmbedBuilder()
+                .setColor(config.theme.danger)
+                .setTitle("Notification: Infraction Issued")
+                .setDescription(`You have received an infraction in **${interaction.guild.name}**.`)
+                .addFields(
+                    { name: "Reason", value: reason },
+                    { name: "Moderator", value: moderator.username }
+                )
+                .setTimestamp();
+            await target.send({ embeds: [dmEmbed] });
+        } catch (e) {
+            console.warn(`[INFRACTION DM SKIP] Could not DM user ${target.id}: ${e.message}`);
+        }
+
+        // Log to logs channel
         if (config.channels.logs) {
             const logChannel = await client.channels.fetch(config.channels.logs).catch(() => null);
             if (logChannel) {
-                await logChannel.send({ embeds: [embed] });
+                await logChannel.send({ 
+                    content: `**New Infraction:** ${target}`,
+                    embeds: [embed] 
+                });
             }
         }
     },

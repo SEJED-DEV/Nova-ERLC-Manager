@@ -49,6 +49,22 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
 
+        // DM the user
+        try {
+            const dmEmbed = new EmbedBuilder()
+                .setColor(config.theme.success)
+                .setTitle("Congratulations! You've been Promoted")
+                .setDescription(`You have been promoted in **${interaction.guild.name}**!`)
+                .addFields(
+                    { name: "New Rank", value: newRank },
+                    { name: "Promoted By", value: moderator.username }
+                )
+                .setTimestamp();
+            await target.send({ embeds: [dmEmbed] });
+        } catch (e) {
+            console.warn(`[PROMOTION DM SKIP] Could not DM user ${target.id}: ${e.message}`);
+        }
+ 
         // Log to announcements or logs
         const announceChannel = await client.channels.fetch(config.channels.announcements).catch(() => null);
         if (announceChannel) {

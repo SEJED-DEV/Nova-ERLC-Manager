@@ -10,9 +10,8 @@ module.exports = {
     async execute(interaction, client) {
         const { session, theme, roles, channels } = config;
 
-        const embedHeader = new EmbedBuilder()
-            .setColor(theme.color)
-            .setImage(session.images.header || null);
+        const embedHeader = new EmbedBuilder().setColor(theme.color);
+        if (session.images.header) embedHeader.setImage(session.images.header);
 
         let joinBlock = "> **Server Name**: " + (session.serverName || "Not Configured") + "\n" +
                         "> **Server Owner**: " + (session.serverOwner || "Not Configured") + "\n" +
@@ -30,8 +29,9 @@ module.exports = {
                 "**Game Information**\n" +
                 joinBlock
             )
-            .setImage(session.images.footer || null)
             .setFooter({ text: client.user.username });
+        
+        if (session.images.footer) embedMain.setImage(session.images.footer);
 
         const components = [];
         if (session.quickJoinUrl) {
