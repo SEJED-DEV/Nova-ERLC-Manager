@@ -1,0 +1,85 @@
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const config = require("../../../config");
+const crypto = require("crypto");
+
+module.exports = {
+    staffOnly: true,
+    data: new SlashCommandBuilder()
+        .setName("session-start")
+        .setDescription("Host a session start up."),
+    async execute(interaction, client) {
+        const { session, theme, roles, channels } = config;
+
+        const embedHeader = new EmbedBuilder()
+            .setColor(theme.color)
+            .setImage(session.images.header || null);
+
+        let joinBlock = "> **Server Name**: " + (session.serverName || "Not Configured") + "\n" +
+                        "> **Server Owner**: " + (session.serverOwner || "Not Configured") + "\n" +
+                        "> **Join Code**: " + (session.joinCode || "Not Configured") + "\n\n";
+
+        if (!session.quickJoinUrl) {
+            joinBlock += "> *Note: The bot developers didn't add a quick join link. Please use the Join Code directly in-game.*";
+        }
+
+        const embedMain = new EmbedBuilder()
+            .setColor(theme.color)
+            .setTitle("**Session Startup**")
+            .setDescription(
+                "> A server start-up has been initiated! Please ensure you have read and understood our regulations prior to joining.\n\n" +
+                "**Game Information**\n" +
+                joinBlock
+            )
+            .setImage(session.images.footer || null)
+            .setFooter({ text: client.user.username });
+
+        const components = [];
+        if (session.quickJoinUrl) {
+            const startLinkButton = new ButtonBuilder()
+                .setLabel("Quick Join")
+                .setURL(session.quickJoinUrl)
+                .setStyle(ButtonStyle.Link);
+            components.push(new ActionRowBuilder().addComponents(startLinkButton));
+        }
+
+        // Fetch voters if any
+        let votersList = "**No voters recorded!**";
+        if (client.voteMap && client.activePollId) {
+            const voters = client.voteMap.get(client.activePollId);
+            if (voters && voters.size > 0) {
+                const votersArray = [...voters.values()];
+                votersList = votersArray.map((v) => `<@${v.userId}>`).join(", ");
+            }
+        }
+
+        let channel;
+        if (channels.session) {
+            channel = await client.channels.fetch(channels.session).catch(() => null);
+        }
+        if (!channel) {
+            channel = interaction.channel; // Fallback to current channel if not configured
+        }
+
+        if (channel) {
+            const msg = await channel.send({
+                content: `<@&${roles.notifications}>\n-# ${votersList}`,
+                embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
+                components: components
+            });
+
+            // Save to DB for Live Auto-Updating Panel
+            const db = require("../../../db");
+            const sessionIdStr = client.activePollId || crypto.randomBytes(6).toString("hex");
+            try {
+                db.prepare("INSERT INTO sessions (id, channelId, messageId) VALUES (?, ?, ?)").run(sessionIdStr, channel.id, msg.id);
+            } catch (err) {
+                console.error("Failed to insert session tracking:", err);
+            }
+        }
+
+        await interaction.reply({
+            content: "**Successfully** hosted a session start up.",
+            ephemeral: true,
+        });
+    },
+};

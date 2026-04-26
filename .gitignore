@@ -1,0 +1,16 @@
+node_modules/
+.env
+database.sqlite
+database.sqlite-wal
+database.sqlite-shm
+.DS_Store
+dist/
+build/
+Session\ Commands/
+
+# Exclude all markdown files except README
+*.md
+!README.md
+
+# Ignore VSCode settings
+.vscode/
