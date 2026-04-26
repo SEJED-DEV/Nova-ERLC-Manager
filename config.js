@@ -19,7 +19,7 @@ module.exports = {
     },
     roles: {
         staff: process.env.STAFF_ROLE_ID,
-        notifications: process.env.NOTIFICATIONS_ROLE_ID,
+        notifications: process.env.NOTIFICATIONS_ROLE_ID ? process.env.NOTIFICATIONS_ROLE_ID.split(',').map(id => id.trim()) : [],
     },
     session: {
         serverName: process.env.SERVER_NAME,

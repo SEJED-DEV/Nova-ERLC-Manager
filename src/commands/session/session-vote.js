@@ -70,8 +70,14 @@ module.exports = {
             channel = interaction.channel; // Fallback to current channel if not configured
         }
 
+        const pings = roles.notifications.map(id => {
+            if (id.toLowerCase() === "everyone") return "@everyone";
+            if (id.toLowerCase() === "here") return "@here";
+            return `<@&${id}>`;
+        }).join(" ");
+
         await channel.send({
-            content: roles.notifications ? `<@&${roles.notifications}>` : null,
+            content: pings || null,
             embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
             components: [row],
         });

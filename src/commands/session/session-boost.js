@@ -25,8 +25,14 @@ module.exports = {
         }
 
         if (channel) {
+            const pings = roles.notifications.map(id => {
+                if (id.toLowerCase() === "everyone") return "@everyone";
+                if (id.toLowerCase() === "here") return "@here";
+                return `<@&${id}>`;
+            }).join(" ");
+
             await channel.send({
-                content: roles.notifications ? `<@&${roles.notifications}>` : null,
+                content: pings || null,
                 embeds: [embed],
             });
         }

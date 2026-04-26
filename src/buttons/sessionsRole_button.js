@@ -4,9 +4,9 @@ module.exports = {
     // Matches on the full customId
     customId: "sessionsRole:button",
     async execute(interaction) {
-        const roleId = config.roles.notifications;
+        const roleId = config.roles.notifications.find(id => id.toLowerCase() !== "everyone" && id.toLowerCase() !== "here");
         if (!roleId) {
-            return interaction.reply({ content: "⚠️ Notification role is not configured.", ephemeral: true });
+            return interaction.reply({ content: "⚠️ No togglable notification role is configured.", ephemeral: true });
         }
 
         if (!interaction.member) {

@@ -8,9 +8,14 @@ dist/
 build/
 Session\ Commands/
 
-# Exclude all markdown files except README
+# Exclude all markdown files except README and CHANGELOG
 *.md
 !README.md
+!CHANGELOG.md
+
+# Config
+.env
+!.env.example
 
 # Ignore VSCode settings
 .vscode/

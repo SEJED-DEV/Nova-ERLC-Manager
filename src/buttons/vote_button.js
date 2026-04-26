@@ -143,9 +143,15 @@ module.exports = {
                     .setStyle(ButtonStyle.Link)
             );
 
+            const pings = roles.notifications.map(id => {
+                if (id.toLowerCase() === "everyone") return "@everyone";
+                if (id.toLowerCase() === "here") return "@here";
+                return `<@&${id}>`;
+            }).join(" ");
+
             try {
                 await interaction.channel.send({
-                    content: `<@&${roles.notifications}> Session is starting thanks to: ${votersMentions}`,
+                    content: `${pings} Session is starting thanks to: ${votersMentions}`,
                     embeds: [embedMain],
                     components: [startLinkButton],
                 });

@@ -61,8 +61,14 @@ module.exports = {
         }
 
         if (channel) {
+            const pings = roles.notifications.map(id => {
+                if (id.toLowerCase() === "everyone") return "@everyone";
+                if (id.toLowerCase() === "here") return "@here";
+                return `<@&${id}>`;
+            }).join(" ");
+
             const msg = await channel.send({
-                content: `<@&${roles.notifications}>\n-# ${votersList}`,
+                content: `${pings}\n-# ${votersList}`,
                 embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
                 components: components
             });
