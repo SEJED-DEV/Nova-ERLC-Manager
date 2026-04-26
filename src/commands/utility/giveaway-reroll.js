@@ -16,19 +16,19 @@ module.exports = {
 
         const giveaway = db.prepare("SELECT * FROM giveaways WHERE messageId = ?").get(messageId);
         if (!giveaway) {
-            return interaction.reply({ content: "❌ Giveaway not found. Make sure you have the right message ID.", ephemeral: true });
+            return interaction.reply({ content: "❌ Giveaway not found. Make sure you have the right message ID.", flags: [64] });
         }
 
         // Check there are still remaining (non-winning) entries to draw from
         const remainingEntries = db.prepare("SELECT COUNT(*) as count FROM giveaway_entries WHERE messageId = ?").get(messageId);
         if (remainingEntries.count === 0) {
-            return interaction.reply({ content: "❌ No remaining entries to reroll from. All participants have already won.", ephemeral: true });
+            return interaction.reply({ content: "❌ No remaining entries to reroll from. All participants have already won.", flags: [64] });
         }
 
         // FIXED: Defer the reply immediately — endGiveaway does several async operations
         // (channel fetch, message fetch, message edit, channel.send) that can easily exceed
         // Discord's 3-second interaction response deadline.
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: [64] });
 
         // Set back to active so endGiveaway processes it
         db.prepare("UPDATE giveaways SET status = 'active' WHERE messageId = ?").run(messageId);

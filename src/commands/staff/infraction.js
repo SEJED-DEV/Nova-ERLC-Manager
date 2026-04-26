@@ -26,7 +26,7 @@ module.exports = {
             stmt.run(target.id, moderator.id, reason);
         } catch (e) {
             console.error("Database error in infraction.js:", e);
-            return interaction.reply({ content: "Failed to issue infraction due to a database error.", ephemeral: true });
+            return interaction.reply({ content: "Failed to issue infraction due to a database error.", flags: [64] });
         }
 
         const embed = new EmbedBuilder()

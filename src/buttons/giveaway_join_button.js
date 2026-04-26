@@ -9,7 +9,7 @@ module.exports = {
         // Verify the giveaway is still active
         const giveaway = db.prepare("SELECT id FROM giveaways WHERE messageId = ? AND status = 'active'").get(messageId);
         if (!giveaway) {
-            return interaction.reply({ content: "This giveaway has ended or does not exist.", ephemeral: true });
+            return interaction.reply({ content: "This giveaway has ended or does not exist.", flags: [64] });
         }
 
         try {
@@ -20,17 +20,17 @@ module.exports = {
             ).run(messageId, userId);
 
             if (result.changes === 0) {
-                return interaction.reply({ content: "You have already joined this giveaway.", ephemeral: true });
+                return interaction.reply({ content: "You have already joined this giveaway.", flags: [64] });
             }
 
             const entryCount = db.prepare("SELECT COUNT(*) as count FROM giveaway_entries WHERE messageId = ?").get(messageId).count;
             return interaction.reply({
                 content: `🎉 You've successfully joined the giveaway! There are now **${entryCount}** entries.`,
-                ephemeral: true,
+                flags: [64],
             });
         } catch (err) {
             console.error("[GIVEAWAY JOIN ERROR]", err);
-            const reply = { content: "An error occurred while joining the giveaway. Please try again.", ephemeral: true };
+            const reply = { content: "An error occurred while joining the giveaway. Please try again.", flags: [64] };
             if (interaction.replied || interaction.deferred) return interaction.followUp(reply).catch(() => null);
             return interaction.reply(reply).catch(() => null);
         }

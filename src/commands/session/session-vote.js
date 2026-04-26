@@ -16,13 +16,14 @@ module.exports = {
         return crypto.randomBytes(6).toString("hex");
     },
     async execute(interaction, client) {
+        // Defer immediately to prevent "Unknown Interaction" (10062) if API is slow
+        await interaction.deferReply({ flags: [64] }).catch(() => null);
+
         const pollSessionId = this.generateSessionId();
         const requiredVotes = interaction.options.getInteger("required_votes");
         const { session, theme, roles, channels, emojis } = config;
 
         // Register this poll as the active one immediately (before anyone clicks).
-        // vote_button.js will skip overwriting if activePollId is already set,
-        // so the first /session-vote always wins.
         if (!client.voteMap) client.voteMap = new Map();
         client.voteMap.set(pollSessionId, new Map());
         client.activePollId = pollSessionId;
@@ -42,7 +43,9 @@ module.exports = {
         }).join(" ");
 
         const embedHeader = new EmbedBuilder().setColor(theme.color);
-        if (session.images.header) embedHeader.setImage(session.images.header);
+        if (session.images.header && session.images.header.startsWith("http")) {
+            embedHeader.setImage(session.images.header);
+        }
 
         const embedMain = new EmbedBuilder()
             .setColor(theme.color)
@@ -53,7 +56,9 @@ module.exports = {
             )
             .setFooter({ text: client.user.username });
         
-        if (session.images.footer) embedMain.setImage(session.images.footer);
+        if (session.images.footer && session.images.footer.startsWith("http")) {
+            embedMain.setImage(session.images.footer);
+        }
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -67,24 +72,30 @@ module.exports = {
                 .setStyle(ButtonStyle.Secondary)
         );
 
-        let channel;
-        if (channels.session) {
-            channel = await client.channels.fetch(channels.session).catch(() => null);
-        }
-        
-        if (!channel) {
-            channel = interaction.channel; // Fallback to current channel if not configured
-        }
+        try {
+            let channel;
+            if (channels.session) {
+                channel = await client.channels.fetch(channels.session).catch(() => null);
+            }
+            
+            if (!channel) {
+                channel = interaction.channel; // Fallback to current channel if not configured
+            }
 
-        await channel.send({
-            content: pings || null,
-            embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
-            components: [row],
-        });
+            await channel.send({
+                content: pings || null,
+                embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
+                components: [row],
+            });
 
-        await interaction.reply({
-            content: `**Successfully** hosted a session vote requiring ${requiredVotes} votes.`,
-            ephemeral: true,
-        });
+            await interaction.editReply({
+                content: `**Successfully** hosted a session vote requiring ${requiredVotes} votes.`,
+            });
+        } catch (error) {
+            console.error("[VOTE COMMAND ERROR]", error);
+            await interaction.editReply({
+                content: "❌ An error occurred while sending the vote message. Please check the logs channel.",
+            }).catch(() => null);
+        }
     },
 };

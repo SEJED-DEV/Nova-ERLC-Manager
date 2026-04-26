@@ -32,11 +32,11 @@ module.exports = {
             
             const durationMs = ms(durationStr);
             if (!durationMs) {
-                return interaction.reply({ content: "Invalid duration format. Use 1h, 1d, 30m, etc.", ephemeral: true });
+                return interaction.reply({ content: "Invalid duration format. Use 1h, 1d, 30m, etc.", flags: [64] });
             }
             
             if (durationMs > 2147483647) {
-                return interaction.reply({ content: "Giveaway duration cannot exceed 24 days.", ephemeral: true });
+                return interaction.reply({ content: "Giveaway duration cannot exceed 24 days.", flags: [64] });
             }
 
             const endTime = Date.now() + durationMs;
@@ -100,17 +100,17 @@ module.exports = {
             
             const giveaway = db.prepare("SELECT * FROM giveaways WHERE messageId = ?").get(messageId);
             if (!giveaway) {
-                return interaction.reply({ content: "Could not find an active giveaway with that message ID.", ephemeral: true });
+                return interaction.reply({ content: "Could not find an active giveaway with that message ID.", flags: [64] });
             }
 
             if (giveaway.status !== "active") {
-                return interaction.reply({ content: "That giveaway has already ended.", ephemeral: true });
+                return interaction.reply({ content: "That giveaway has already ended.", flags: [64] });
             }
 
             // Trigger the end event immediately
             client.emit("giveawayEnd", messageId);
 
-            await interaction.reply({ content: `**Successfully** ended giveaway \`${messageId}\`.`, ephemeral: true });
+            await interaction.reply({ content: `**Successfully** ended giveaway \`${messageId}\`.`, flags: [64] });
         }
     },
 };

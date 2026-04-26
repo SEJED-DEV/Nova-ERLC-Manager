@@ -23,7 +23,7 @@ module.exports = {
                 if (!isOwner && (!member || !member.roles.cache.has(config.roles.staff))) {
                     return interaction.reply({
                         content: "You do not have permission to use this command.",
-                        ephemeral: true,
+                        flags: [64],
                     });
                 }
             }
@@ -49,7 +49,7 @@ module.exports = {
                     }
                 }
 
-                const reply = { content: "There was an error while executing this command!", ephemeral: true };
+                const reply = { content: "There was an error while executing this command!", flags: [64] };
                 if (interaction.replied || interaction.deferred) await interaction.followUp(reply).catch(() => null);
                 else await interaction.reply(reply).catch(() => null);
             }
@@ -68,7 +68,7 @@ module.exports = {
                 const remaining = ((BUTTON_COOLDOWN_MS - (now - lastClick)) / 1000).toFixed(1);
                 return interaction.reply({
                     content: `⏱️ Please wait **${remaining}s** before clicking again.`,
-                    ephemeral: true,
+                    flags: [64],
                 });
             }
             // Update cooldown — remove from map automatically when it expires to prevent memory leak
@@ -109,7 +109,7 @@ module.exports = {
                     }
                 }
 
-                const reply = { content: "An error occurred while processing this button.", ephemeral: true };
+                const reply = { content: "An error occurred while processing this button.", flags: [64] };
                 if (interaction.replied || interaction.deferred) await interaction.followUp(reply).catch(() => null);
                 else await interaction.reply(reply).catch(() => null);
             }

@@ -21,7 +21,9 @@ module.exports = {
             .setDescription(config.messages.boost)
             .setFooter({ text: `${client.user.username} | Boost` });
         
-        if (session.images.header) embed.setImage(session.images.header);
+        if (session.images.header && session.images.header.startsWith("http")) {
+            embed.setImage(session.images.header);
+        }
 
         let channel;
         if (channels.session) {
@@ -40,7 +42,7 @@ module.exports = {
 
         await interaction.reply({
             content: "**Successfully** sent a session boost.",
-            ephemeral: true,
+            flags: [64],
         });
     },
 };

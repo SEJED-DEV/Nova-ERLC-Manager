@@ -59,7 +59,7 @@ module.exports = {
 
         // If session was already triggered by another concurrent click, bail out
         if (!votes) {
-            return interaction.reply({ content: "This vote has already concluded!", ephemeral: true });
+            return interaction.reply({ content: "This vote has already concluded!", flags: [64] });
         }
 
         const userId = interaction.user.id;
@@ -67,10 +67,10 @@ module.exports = {
 
         if (hasVoted) {
             votes.delete(userId);
-            await interaction.reply({ content: "Your vote has been removed.", ephemeral: true });
+            await interaction.reply({ content: "Your vote has been removed.", flags: [64] });
         } else {
             votes.set(userId, { userId, timestamp: Date.now() });
-            await interaction.reply({ content: "Your vote has been counted!", ephemeral: true });
+            await interaction.reply({ content: "Your vote has been counted!", flags: [64] });
         }
 
         const count = votes.size;
@@ -134,7 +134,9 @@ module.exports = {
                     "> **Join Code**: " + (session.joinCode || "N/A") + "\n\n"
                 );
             
-            if (session.images.header) embedMain.setImage(session.images.header);
+            if (session.images.header && session.images.header.startsWith("http")) {
+                embedMain.setImage(session.images.header);
+            }
 
             const quickJoinLink = session.quickJoinUrl || "https://policeroleplay.community/";
             const startLinkButton = new ActionRowBuilder().addComponents(

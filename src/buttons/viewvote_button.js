@@ -8,7 +8,7 @@ module.exports = {
         const votes = client.voteMap?.get(sessionId);
 
         if (!votes || votes.size === 0) {
-            return interaction.reply({ content: "No votes yet!", ephemeral: true });
+            return interaction.reply({ content: "No votes yet!", flags: [64] });
         }
 
         const votersList = [...votes.values()].map(v => `<@${v.userId}>`).join("\n");
@@ -19,6 +19,6 @@ module.exports = {
             .setFooter({ text: `${votes.size} total voter(s)` })
             .setTimestamp();
 
-        return interaction.reply({ embeds: [embed], ephemeral: true });
+        return interaction.reply({ embeds: [embed], flags: [64] });
     },
 };

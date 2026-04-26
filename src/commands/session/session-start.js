@@ -8,10 +8,15 @@ module.exports = {
         .setName("session-start")
         .setDescription("Host a session start up."),
     async execute(interaction, client) {
-        const { session, theme, roles, channels } = config;
+        // Defer immediately to prevent "Unknown Interaction" (10062) if API is slow
+        await interaction.deferReply({ flags: [64] }).catch(() => null);
 
+        const { session, theme, roles, channels } = config;
+ 
         const embedHeader = new EmbedBuilder().setColor(theme.color);
-        if (session.images.header) embedHeader.setImage(session.images.header);
+        if (session.images.header && session.images.header.startsWith("http")) {
+            embedHeader.setImage(session.images.header);
+        }
 
         let joinBlock = "> **Server Name**: " + (session.serverName || "Not Configured") + "\n" +
                         "> **Server Owner**: " + (session.serverOwner || "Not Configured") + "\n" +
@@ -31,7 +36,9 @@ module.exports = {
             )
             .setFooter({ text: client.user.username });
         
-        if (session.images.footer) embedMain.setImage(session.images.footer);
+        if (session.images.footer && session.images.footer.startsWith("http")) {
+            embedMain.setImage(session.images.footer);
+        }
 
         const components = [];
         if (session.quickJoinUrl) {
@@ -52,40 +59,46 @@ module.exports = {
             }
         }
 
-        let channel;
-        if (channels.session) {
-            channel = await client.channels.fetch(channels.session).catch(() => null);
-        }
-        if (!channel) {
-            channel = interaction.channel; // Fallback to current channel if not configured
-        }
-
-        if (channel) {
-            const pings = roles.notifications.map(id => {
-                if (id.toLowerCase() === "everyone") return "@everyone";
-                if (id.toLowerCase() === "here") return "@here";
-                return `<@&${id}>`;
-            }).join(" ");
-
-            const msg = await channel.send({
-                content: `${pings}\n-# ${votersList}`,
-                embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
-                components: components
-            });
-
-            // Save to DB for Live Auto-Updating Panel
-            const db = require("../../../db");
-            const sessionIdStr = client.activePollId || crypto.randomBytes(6).toString("hex");
-            try {
-                db.prepare("INSERT INTO sessions (id, channelId, messageId) VALUES (?, ?, ?)").run(sessionIdStr, channel.id, msg.id);
-            } catch (err) {
-                console.error("Failed to insert session tracking:", err);
+        try {
+            let channel;
+            if (channels.session) {
+                channel = await client.channels.fetch(channels.session).catch(() => null);
             }
-        }
+            if (!channel) {
+                channel = interaction.channel; // Fallback to current channel if not configured
+            }
 
-        await interaction.reply({
-            content: "**Successfully** hosted a session start up.",
-            ephemeral: true,
-        });
+            if (channel) {
+                const pings = roles.notifications.map(id => {
+                    if (id.toLowerCase() === "everyone") return "@everyone";
+                    if (id.toLowerCase() === "here") return "@here";
+                    return `<@&${id}>`;
+                }).join(" ");
+
+                const msg = await channel.send({
+                    content: `${pings}\n-# ${votersList}`,
+                    embeds: embedHeader.data.image ? [embedHeader, embedMain] : [embedMain],
+                    components: components
+                });
+
+                // Save to DB for Live Auto-Updating Panel
+                const db = require("../../../db");
+                const sessionIdStr = client.activePollId || crypto.randomBytes(6).toString("hex");
+                try {
+                    db.prepare("INSERT INTO sessions (id, channelId, messageId) VALUES (?, ?, ?)").run(sessionIdStr, channel.id, msg.id);
+                } catch (err) {
+                    console.error("Failed to insert session tracking:", err);
+                }
+            }
+
+            await interaction.editReply({
+                content: "**Successfully** hosted a session start up.",
+            });
+        } catch (error) {
+            console.error("[STARTUP COMMAND ERROR]", error);
+            await interaction.editReply({
+                content: "❌ An error occurred while starting the session. Please check the logs channel.",
+            }).catch(() => null);
+        }
     },
 };

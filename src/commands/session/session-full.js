@@ -29,7 +29,7 @@ module.exports = {
 
         await interaction.reply({
             content: "**Successfully** announced the session is full.",
-            ephemeral: true,
+            flags: [64],
         });
     },
 };

@@ -14,7 +14,7 @@ module.exports = {
         const { erlc, theme } = config;
 
         if (!erlc.serverKey) {
-            return interaction.reply({ content: "ERLC Server Key not configured in .env", ephemeral: true });
+            return interaction.reply({ content: "ERLC Server Key not configured in .env", flags: [64] });
         }
 
         await interaction.deferReply();

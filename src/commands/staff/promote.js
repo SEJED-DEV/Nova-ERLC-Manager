@@ -32,7 +32,7 @@ module.exports = {
             stmt.run(target.id, moderator.id, oldRank || "None", newRank);
         } catch (e) {
             console.error("Database error in promote.js:", e);
-            return interaction.reply({ content: "Failed to log promotion due to a database error.", ephemeral: true });
+            return interaction.reply({ content: "Failed to log promotion due to a database error.", flags: [64] });
         }
 
         const embed = new EmbedBuilder()
