@@ -12,19 +12,18 @@ module.exports = {
         await interaction.deferReply({ flags: [64] }).catch(() => null);
 
         const { session, theme, roles, channels } = config;
- 
-        const embedHeader = new EmbedBuilder().setColor(theme.color);
-        if (session.images.header && session.images.header.startsWith("http")) {
-            embedHeader.setImage(session.images.header);
-        }
+
 
         let joinBlock = "> **Server Name**: " + (session.serverName || "Not Configured") + "\n" +
-                        "> **Server Owner**: " + (session.serverOwner || "Not Configured") + "\n" +
-                        "> **Join Code**: " + (session.joinCode || "Not Configured") + "\n\n";
+            "> **Server Owner**: " + (session.serverOwner || "Not Configured") + "\n" +
+            "> **Join Code**: " + (session.joinCode || "Not Configured") + "\n\n";
 
         if (!session.quickJoinUrl) {
-            joinBlock += "> *Note: The bot developers didn't add a quick join link. Please use the Join Code directly in-game.*";
+            joinBlock += "> *Note: No quick join link configured. Use the Join Code directly in-game.*";
         }
+
+        const embedHeader = new EmbedBuilder().setColor(theme.color);
+        if (session.images?.header?.startsWith("http")) embedHeader.setImage(session.images.header);
 
         const embedMain = new EmbedBuilder()
             .setColor(theme.color)
@@ -35,10 +34,7 @@ module.exports = {
                 joinBlock
             )
             .setFooter({ text: client.user.username });
-        
-        if (session.images.footer && session.images.footer.startsWith("http")) {
-            embedMain.setImage(session.images.footer);
-        }
+        if (session.images?.footer?.startsWith("http")) embedMain.setImage(session.images.footer);
 
         const components = [];
         if (session.quickJoinUrl) {

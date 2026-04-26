@@ -42,10 +42,9 @@ module.exports = {
             return `<@&${id}>`;
         }).join(" ");
 
+
         const embedHeader = new EmbedBuilder().setColor(theme.color);
-        if (session.images.header && session.images.header.startsWith("http")) {
-            embedHeader.setImage(session.images.header);
-        }
+        if (session.images?.header?.startsWith("http")) embedHeader.setImage(session.images.header);
 
         const embedMain = new EmbedBuilder()
             .setColor(theme.color)
@@ -55,10 +54,8 @@ module.exports = {
                 `> If you vote, you are committing to join. Failure to participate after voting will result in moderation.`
             )
             .setFooter({ text: client.user.username });
-        
-        if (session.images.footer && session.images.footer.startsWith("http")) {
-            embedMain.setImage(session.images.footer);
-        }
+        if (session.images?.footer?.startsWith("http")) embedMain.setImage(session.images.footer);
+
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()

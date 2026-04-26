@@ -133,10 +133,7 @@ module.exports = {
                     "> **Server Name**: " + (session.serverName || "N/A") + "\n" +
                     "> **Join Code**: " + (session.joinCode || "N/A") + "\n\n"
                 );
-            
-            if (session.images.header && session.images.header.startsWith("http")) {
-                embedMain.setImage(session.images.header);
-            }
+            if (session.images?.header?.startsWith("http")) embedMain.setImage(session.images.header);
 
             const quickJoinLink = session.quickJoinUrl || "https://policeroleplay.community/";
             const startLinkButton = new ActionRowBuilder().addComponents(

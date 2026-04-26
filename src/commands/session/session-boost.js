@@ -20,10 +20,8 @@ module.exports = {
             .setTitle("**Session Boost**")
             .setDescription(config.messages.boost)
             .setFooter({ text: `${client.user.username} | Boost` });
+        if (session.images?.header?.startsWith("http")) embed.setImage(session.images.header);
         
-        if (session.images.header && session.images.header.startsWith("http")) {
-            embed.setImage(session.images.header);
-        }
 
         let channel;
         if (channels.session) {

@@ -14,8 +14,11 @@ All notable changes to this project will be documented in this file.
 - **Environment Template**: Created `.env.example` to simplify initial setup for new users.
 
 ### Fixed
-- **Image Validation**: Fixed a crash caused by empty image URLs in `.env` by adding conditional rendering for all embeds.
-- **Command Argument Mismatch**: Fixed a bug where slash commands failed to register due to incorrect argument passing during the `ready` event.
+- **Image Validation**: Fixed a crash caused by invalid image URLs by adding optional-chaining validation before calling `setImage`.
+- **Header/Footer Images**: `HEADER_IMAGE` and `FOOTER_IMAGE` now correctly display on session embeds (`/session-vote`, `/session-start`, `/session-boost`, and the vote auto-start announcement).
+- **Interaction Timeouts**: Added `deferReply()` to all slow commands (`/session-vote`, `/session-start`, `/session-shutdown`) to prevent Discord's `Unknown Interaction (10062)` error.
+- **Double Acknowledgement**: Fixed `Interaction already acknowledged (40060)` error on `/session-vote` caused by a reply/deferReply conflict.
+- **Command Registration**: Fixed a bug where slash commands failed to register due to incorrect argument passing during the `ready` event.
 
 ### Changed
 - **Role Toggle Logic**: The notification role button now intelligently toggles the first valid role ID found in the configuration list.
