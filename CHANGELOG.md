@@ -7,11 +7,18 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **Multiple Notification Roles**: `NOTIFICATIONS_ROLE_ID` now supports a comma-separated list of IDs.
 - **Special Pings**: Added support for `everyone` and `here` keywords in the notification role list.
-- **Expanded Intents**: Included `DirectMessages` and `GuildPresences` in the bot configuration to ensure full functionality and smoother handshakes.
+- **Manual Giveaway Control**: Added `/giveaway end` command to manually conclude giveaways.
+- **DM Notifications**: Added automatic direct messages to users for infractions and promotions.
+- **Enhanced Logging**: Infraction logs now include a mention/ping of the target user for easier tracking.
+- **Expanded Intents**: Included `DirectMessages` and `GuildMembers` in the bot configuration to ensure full functionality.
 - **Environment Template**: Created `.env.example` to simplify initial setup for new users.
- 
+
+### Fixed
+- **Image Validation**: Fixed a crash caused by empty image URLs in `.env` by adding conditional rendering for all embeds.
+- **Command Argument Mismatch**: Fixed a bug where slash commands failed to register due to incorrect argument passing during the `ready` event.
+
 ### Changed
-- **Role Toggle Logic**: The notification role button now intelligently toggles the first valid role ID found in the configuration list, skipping special identifiers.
+- **Role Toggle Logic**: The notification role button now intelligently toggles the first valid role ID found in the configuration list.
  
 ## [1.0.1] - 2026-04-26
 
