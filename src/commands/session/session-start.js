@@ -18,8 +18,15 @@ module.exports = {
             "> **Server Owner**: " + (session.serverOwner || "Not Configured") + "\n" +
             "> **Join Code**: " + (session.joinCode || "Not Configured") + "\n\n";
 
+        let isValidHttpUrl = false;
+        if (session.quickJoinUrl) {
+            isValidHttpUrl = session.quickJoinUrl.match(/^https?:\/\//i) || session.quickJoinUrl.match(/^discord:\/\//i);
+        }
+
         if (!session.quickJoinUrl) {
             joinBlock += "> *Note: No quick join link configured. Use the Join Code directly in-game.*";
+        } else if (!isValidHttpUrl) {
+            joinBlock += "> **Direct Link**: " + session.quickJoinUrl + "\n";
         }
 
         const embedHeader = new EmbedBuilder().setColor(theme.color);
@@ -37,7 +44,7 @@ module.exports = {
         if (session.images?.footer?.startsWith("http")) embedMain.setImage(session.images.footer);
 
         const components = [];
-        if (session.quickJoinUrl) {
+        if (session.quickJoinUrl && isValidHttpUrl) {
             const startLinkButton = new ButtonBuilder()
                 .setLabel("Quick Join")
                 .setURL(session.quickJoinUrl)

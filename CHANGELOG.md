@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - **Environment Template**: Created `.env.example` to simplify initial setup for new users.
 
 ### Fixed
+- **Quick Join Links**: Fixed a crash (`MultiplePossibilitiesConstraintError`) when a non-HTTP link (e.g., `roblox://`) was provided for the `QUICK_JOIN_URL`. The bot now gracefully falls back to displaying the direct link as text instead of attempting to create a Discord button.
 - **Image Validation**: Fixed a crash caused by invalid image URLs by adding optional-chaining validation before calling `setImage`.
 - **Header/Footer Images**: `HEADER_IMAGE` and `FOOTER_IMAGE` now correctly display on session embeds (`/session-vote`, `/session-start`, `/session-boost`, and the vote auto-start announcement).
 - **Interaction Timeouts**: Added `deferReply()` to all slow commands (`/session-vote`, `/session-start`, `/session-shutdown`) to prevent Discord's `Unknown Interaction (10062)` error.

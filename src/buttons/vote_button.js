@@ -5,7 +5,7 @@ const config = require("../../config");
 const editDebounceTimers = new Map();
 
 // Sends DMs to voters one at a time to avoid triggering Discord's DM rate limits
-async function sendDMQueue(client, votersArray, startLinkButton) {
+async function sendDMQueue(client, votersArray, components) {
     for (const v of votersArray) {
         try {
             const user = await client.users.fetch(v.userId);
@@ -15,7 +15,7 @@ async function sendDMQueue(client, votersArray, startLinkButton) {
                     `Hey <@${v.userId}>, thanks for voting! The session is starting now. ` +
                     `Please join to avoid moderation.`
                 );
-            await user.send({ embeds: [dmEmbed], components: [startLinkButton] });
+            await user.send({ embeds: [dmEmbed], components: components });
         } catch (e) {
             // DMs can be closed — this is expected and not a critical error
             console.warn(`[DM SKIP] Could not DM user ${v.userId}: ${e.message}`);
@@ -124,24 +124,33 @@ module.exports = {
             const votersMentions = votersArray.map(v => `<@${v.userId}>`).join(", ");
             const { session, theme, roles } = config;
 
+            let descriptionText = "> The session has reached the required votes and is now starting!\n\n" +
+                "**Game Information**\n" +
+                "> **Server Name**: " + (session.serverName || "N/A") + "\n" +
+                "> **Join Code**: " + (session.joinCode || "N/A") + "\n\n";
+
+            const quickJoinLink = session.quickJoinUrl || "https://policeroleplay.community/";
+            const isValidHttpUrl = quickJoinLink.match(/^https?:\/\//i) || quickJoinLink.match(/^discord:\/\//i);
+
+            if (!isValidHttpUrl) {
+                descriptionText += "> **Direct Link**: " + quickJoinLink + "\n\n";
+            }
+
             const embedMain = new EmbedBuilder()
                 .setColor(theme.success)
                 .setTitle("**Session Started!**")
-                .setDescription(
-                    "> The session has reached the required votes and is now starting!\n\n" +
-                    "**Game Information**\n" +
-                    "> **Server Name**: " + (session.serverName || "N/A") + "\n" +
-                    "> **Join Code**: " + (session.joinCode || "N/A") + "\n\n"
-                );
+                .setDescription(descriptionText);
             if (session.images?.header?.startsWith("http")) embedMain.setImage(session.images.header);
 
-            const quickJoinLink = session.quickJoinUrl || "https://policeroleplay.community/";
-            const startLinkButton = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel("Quick Join")
-                    .setURL(quickJoinLink)
-                    .setStyle(ButtonStyle.Link)
-            );
+            const components = [];
+            if (isValidHttpUrl) {
+                components.push(new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setLabel("Quick Join")
+                        .setURL(quickJoinLink)
+                        .setStyle(ButtonStyle.Link)
+                ));
+            }
 
             const pings = roles.notifications.map(id => {
                 if (id.toLowerCase() === "everyone") return "@everyone";
@@ -153,7 +162,7 @@ module.exports = {
                 await interaction.channel.send({
                     content: `${pings} Session is starting thanks to: ${votersMentions}`,
                     embeds: [embedMain],
-                    components: [startLinkButton],
+                    components: components,
                 });
             } catch (e) {
                 console.error("[SESSION START ERROR] Could not send session started message:", e.message);
@@ -164,7 +173,7 @@ module.exports = {
 
             // Fire and forget the DM queue — doesn't block the interaction response.
             // FIXED: Added .catch() so errors from sendDMQueue don't become unhandled rejections.
-            sendDMQueue(client, votersArray, startLinkButton).catch(e =>
+            sendDMQueue(client, votersArray, components).catch(e =>
                 console.error("[DM QUEUE ERROR] sendDMQueue threw unexpectedly:", e.message)
             );
         }
